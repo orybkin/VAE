@@ -18,7 +18,7 @@ net_arg.add_argument('--c_num', type=int, default=10)  # Number of classes
 
 # Data
 data_arg = add_argument_group('Data')
-data_arg.add_argument('--dataset', type=str, default='cifar10', choices=['cifar10', 'cifar100'])
+data_arg.add_argument('--dataset', type=str, default='cufs', choices=['celeba', 'cufs'])
 data_arg.add_argument('--split', type=str, default='train')
 data_arg.add_argument('--batch_size', type=int, default=100)
 data_arg.add_argument('--batch_size_test', type=int, default=100)
@@ -27,10 +27,10 @@ data_arg.add_argument('--batch_size_test', type=int, default=100)
 train_arg = add_argument_group('Training')
 train_arg.add_argument('--is_train', type=str2bool, default=True)
 train_arg.add_argument('--optimizer', type=str, default='adam')
-train_arg.add_argument('--max_step', type=int, default=2000)
-train_arg.add_argument('--epoch_step', type=int, default=100)
+train_arg.add_argument('--max_step', type=int, default=5000)
+train_arg.add_argument('--epoch_step', type=int, default=400)
 train_arg.add_argument('--lr', type=float, default=1e-3)
-train_arg.add_argument('--min_lr', type=float, default=1e-4)
+train_arg.add_argument('--min_lr', type=float, default=5e-4)
 train_arg.add_argument('--wd_ratio', type=float, default=5e-2)
 train_arg.add_argument('--use_gpu', type=str2bool, default=True)
 
@@ -39,11 +39,11 @@ misc_arg = add_argument_group('Misc')
 
 misc_arg.add_argument('--load_path', type=str, default='')
 misc_arg.add_argument('--log_step', type=int, default=100)
-misc_arg.add_argument('--test_iter', type=int, default=100)
-misc_arg.add_argument('--save_step', type=int, default=200)
+misc_arg.add_argument('--test_iter', type=int, default=3)
+misc_arg.add_argument('--save_step', type=int, default=100)
 misc_arg.add_argument('--log_level', type=str, default='INFO', choices=['INFO', 'DEBUG', 'WARN'])
-misc_arg.add_argument('--log_dir', type=str, default='logs')
-misc_arg.add_argument('--data_dir', type=str, default='../data/')
+misc_arg.add_argument('--log_dir', type=str, default='/NAS/home/logs/cis680_hw4/')
+misc_arg.add_argument('--data_dir', type=str, default='/NAS/data/cis680/')
 misc_arg.add_argument('--random_seed', type=int, default=0)
 
 def get_config():

@@ -1,0 +1,14 @@
+Use l-relu?
+
+
+encoder:
+    use convolution instead of pool
+
+
+
+Drew:
+    USE tf builtin CE loss
+    try removing noise and KL loss
+    look at outputs and weights etc of the network at each iteration
+    look at the graph
+    look at the runtime tensor shapes

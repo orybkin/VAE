@@ -1,0 +1,11 @@
+AE:
+    The network overfits if using fc layers in the middle. With early stopping the error is bearable - it outputs mean face over the dataset
+        0.9 dropout only makes the results more terrible
+
+    If using batchnorm/slim.batchnorm - everything breaks
+
+    On the celeba dataset the behaviour is similar, test it again.
+
+
+VAE:
+    Removing fc decoder layer helps
