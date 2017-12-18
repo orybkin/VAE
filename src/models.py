@@ -106,7 +106,7 @@ def VAE(x, labels, c_num, batch_size, is_train, reuse):
         pool_size = 2
         pool = tf.nn.max_pool
         enc_ksize = 3
-        n_latent=64
+        n_latent=512
 
         x_input=x
 
@@ -114,7 +114,7 @@ def VAE(x, labels, c_num, batch_size, is_train, reuse):
 
         #with tf.variable_scope('encoder', reuse=reuse):
 
-        filter_num = 4
+        filter_num = 32
         x=encoder(x, enc_ksize, pool_size, pool, filter_num, is_train, reuse, additional_layers=True)
         x_enc_sz=x.get_shape()
         filter_num=x_enc_sz[3]
@@ -138,10 +138,10 @@ def VAE(x, labels, c_num, batch_size, is_train, reuse):
                 loss_KL = -0.5 * tf.reduce_mean(1 + (((std))) - tf.square(mean) - tf.exp(std))
 
             with tf.variable_scope('fc_latent', reuse=reuse):
-                x = fc_factory(x, x_enc_sz[1]*x_enc_sz[2]*x_enc_sz[3], is_train, pure=True, reuse=reuse)
-                x = tf.reshape(x,[batch_size, x_enc_sz[1], x_enc_sz[2], -1]) #x_enc_sz[3]]) #16]) #
+                x = fc_factory(x, tf.Dimension(2*2)*x_enc_sz[1]*x_enc_sz[2]*x_enc_sz[3], is_train, pure=True, reuse=reuse)
+                x = tf.reshape(x,[batch_size, tf.Dimension(2)*x_enc_sz[1], tf.Dimension(2)*x_enc_sz[2], -1]) #x_enc_sz[3]]) #16]) #
 
-        x=decoder(x, None, filter_num, is_train, reuse)
+        x=decoder(x, None, filter_num, is_train, reuse, additional_layers=True)
 
         with tf.variable_scope('loss', reuse=reuse):
             # x_input = tf.clip_by_value(x_input, 1e-10, 1- 1e-10)
@@ -151,7 +151,7 @@ def VAE(x, labels, c_num, batch_size, is_train, reuse):
             # loss_rec = tf.reduce_mean(tf.pow(x_input-x,2))
 
 
-    loss=tf.reduce_mean(loss_rec+loss_KL)
+    loss=tf.reduce_mean(loss_rec+loss_KL/10)
 
     variables = tf.contrib.framework.get_variables(vs)
     return loss, latent, loss_rec, variables, x

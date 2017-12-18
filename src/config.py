@@ -18,7 +18,7 @@ net_arg.add_argument('--c_num', type=int, default=10)  # Number of classes
 
 # Data
 data_arg = add_argument_group('Data')
-data_arg.add_argument('--dataset', type=str, default='cufs', choices=['celeba', 'cufs'])
+data_arg.add_argument('--dataset', type=str, default='celeba', choices=['celeba', 'cufs'])
 data_arg.add_argument('--split', type=str, default='train')
 data_arg.add_argument('--batch_size', type=int, default=100)
 data_arg.add_argument('--batch_size_test', type=int, default=100)
@@ -27,10 +27,10 @@ data_arg.add_argument('--batch_size_test', type=int, default=100)
 train_arg = add_argument_group('Training')
 train_arg.add_argument('--is_train', type=str2bool, default=True)
 train_arg.add_argument('--optimizer', type=str, default='adam')
-train_arg.add_argument('--max_step', type=int, default=5000)
+train_arg.add_argument('--max_step', type=int, default=10000)
 train_arg.add_argument('--epoch_step', type=int, default=400)
 train_arg.add_argument('--lr', type=float, default=1e-3)
-train_arg.add_argument('--min_lr', type=float, default=5e-4)
+train_arg.add_argument('--min_lr', type=float, default=3e-4)
 train_arg.add_argument('--wd_ratio', type=float, default=5e-2)
 train_arg.add_argument('--use_gpu', type=str2bool, default=True)
 

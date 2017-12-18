@@ -25,7 +25,7 @@ def conv_factory(x, hidden_num, kernel_size, stride, is_train, pure=False, reuse
 def deconv_factory(batch_input, out_channels, is_train, pure=False, reuse=False):
     vs = tf.get_variable_scope()
     batch, in_height, in_width, in_channels = [int(d) for d in batch_input.get_shape()]
-    filter = tf.get_variable("weights", [4, 4, out_channels, in_channels], dtype=tf.float32,
+    filter = tf.get_variable("weights", [3, 3, out_channels, in_channels], dtype=tf.float32,
                              initializer=tf.random_normal_initializer(0, 0.02))
     # [batch, in_height, in_width, in_channels], [filter_width, filter_height, out_channels, in_channels]
     #     => [batch, out_height, out_width, out_channels]
@@ -102,6 +102,8 @@ def encoder(x, ksize, pool_size, pool, hidden_num, is_train, reuse, additional_l
     if additional_layers:
         with tf.variable_scope('conv11', reuse=reuse):
             x = conv_factory(x, hidden_num, ksize, 1, is_train, reuse=reuse)
+        with tf.variable_scope('conv12', reuse=reuse):
+            x = conv_factory(x, hidden_num, ksize, 1, is_train, reuse=reuse)
 
     # conv2
     with tf.variable_scope('conv2', reuse=reuse):
@@ -112,6 +114,8 @@ def encoder(x, ksize, pool_size, pool, hidden_num, is_train, reuse, additional_l
     if additional_layers:
         with tf.variable_scope('conv21', reuse=reuse):
             x = conv_factory(x, hidden_num, ksize, 1, is_train, reuse=reuse)
+        with tf.variable_scope('conv22', reuse=reuse):
+            x = conv_factory(x, hidden_num, ksize, 1, is_train, reuse=reuse)
 
     # conv3
     with tf.variable_scope('conv3', reuse=reuse):
@@ -121,6 +125,8 @@ def encoder(x, ksize, pool_size, pool, hidden_num, is_train, reuse, additional_l
 
     if additional_layers:
         with tf.variable_scope('conv31', reuse=reuse):
+            x = conv_factory(x, hidden_num, ksize, 1, is_train, reuse=reuse)
+        with tf.variable_scope('conv32', reuse=reuse):
             x = conv_factory(x, hidden_num, ksize, 1, is_train, reuse=reuse)
 
 
@@ -133,6 +139,8 @@ def encoder(x, ksize, pool_size, pool, hidden_num, is_train, reuse, additional_l
     if additional_layers:
         with tf.variable_scope('conv41', reuse=reuse):
             x = conv_factory(x, hidden_num, ksize, 1, is_train, reuse=reuse)
+        with tf.variable_scope('conv42', reuse=reuse):
+            x = conv_factory(x, hidden_num, ksize, 1, is_train, reuse=reuse)
 
 
     with tf.variable_scope('conv5', reuse=reuse):
@@ -141,10 +149,22 @@ def encoder(x, ksize, pool_size, pool, hidden_num, is_train, reuse, additional_l
         # x = pool(x, ksize=[1, pool_size, pool_size, 1], strides=[1, 2, 2, 1], padding='VALID')
         print(x)
 
+    # if additional_layers:
+    #     with tf.variable_scope('conv51', reuse=reuse):
+    #         x = conv_factory(x, hidden_num, ksize, 1, is_train, reuse=reuse)
+    #     with tf.variable_scope('conv52', reuse=reuse):
+    #         x = conv_factory(x, hidden_num, ksize, 1, is_train, reuse=reuse)
+
+    with tf.variable_scope('conv6', reuse=reuse):
+        # hidden_num = 2 * hidden_num
+        x = conv_factory(x, hidden_num, ksize, 2, is_train, reuse=reuse)
+        # x = pool(x, ksize=[1, pool_size, pool_size, 1], strides=[1, 2, 2, 1], padding='VALID')
+        print(x)
+
     return x
 
 
-def decoder(x, ksize, hidden_num, is_train, reuse):
+def decoder(x, ksize, hidden_num, is_train, reuse, additional_layers=False):
 
     def deconv_factory1(x, out_channels, is_train, pure=False, reuse=False):
         x = tf.image.resize_nearest_neighbor(x, size=(x.get_shape()[1]*2, x.get_shape()[2]*2))
@@ -155,17 +175,42 @@ def decoder(x, ksize, hidden_num, is_train, reuse):
         hidden_num = int(hidden_num / 2)
         x = deconv_factory(x, hidden_num, is_train, reuse=reuse)
 
+    if additional_layers:
+        with tf.variable_scope('deconv11', reuse=reuse):
+            x = conv_factory(x, hidden_num, 3, 1, is_train, reuse=reuse)
+        with tf.variable_scope('deconv12', reuse=reuse):
+            x = conv_factory(x, hidden_num, 3, 1, is_train, reuse=reuse)
+
     with tf.variable_scope('deconv2', reuse=reuse):
         hidden_num = int(hidden_num / 2)
         x = deconv_factory(x, hidden_num, is_train, reuse=reuse)
+
+
+    if additional_layers:
+        with tf.variable_scope('deconv21', reuse=reuse):
+            x = conv_factory(x, hidden_num, 3, 1, is_train, reuse=reuse)
+        with tf.variable_scope('deconv22', reuse=reuse):
+            x = conv_factory(x, hidden_num, 3, 1, is_train, reuse=reuse)
 
     with tf.variable_scope('deconv3', reuse=reuse):
         hidden_num = int(hidden_num / 2)
         x = deconv_factory(x, hidden_num, is_train, reuse=reuse)
 
+    if additional_layers:
+        with tf.variable_scope('deconv31', reuse=reuse):
+            x = conv_factory(x, hidden_num, 3, 1, is_train, reuse=reuse)
+        with tf.variable_scope('deconv32', reuse=reuse):
+            x = conv_factory(x, hidden_num, 3, 1, is_train, reuse=reuse)
+
     with tf.variable_scope('deconv4', reuse=reuse):
         hidden_num = int(hidden_num / 2)
         x = deconv_factory(x, hidden_num, is_train, reuse=reuse)
+
+    if additional_layers:
+        with tf.variable_scope('deconv41', reuse=reuse):
+            x = conv_factory(x, hidden_num, 3, 1, is_train, reuse=reuse)
+        with tf.variable_scope('deconv42', reuse=reuse):
+            x = conv_factory(x, hidden_num, 3, 1, is_train, reuse=reuse)
 
     with tf.variable_scope('last', reuse=reuse):
         hidden_num = int(hidden_num / 2)

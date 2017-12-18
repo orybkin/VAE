@@ -1,0 +1,83 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: vae
+spec:
+  template:
+    metadata:
+      labels:
+        app: vae
+      name: vae
+    spec:
+       affinity: {
+           nodeAffinity: {
+             requiredDuringSchedulingIgnoredDuringExecution: {
+               nodeSelectorTerms: [
+                 {
+                   matchExpressions: [
+                     {
+                       "key": "alpha.kubernetes.io/nvidia-gpu-name",
+                       "operator": "In",
+                       "values": ["Tesla-V100-DGXS-16GB"]
+                     }
+                   ]
+                 }
+               ]
+             }
+           }
+         }
+       restartPolicy: OnFailure
+       securityContext:
+           runAsUser: 1000013
+           # runAsUser: 1000006
+           fsGroup: 1000001
+       volumes:
+       - hostPath:
+           path: /usr/lib/nvidia-384/bin
+         name: bin
+       - hostPath:
+           path: /usr/lib/nvidia-384
+         name: lib
+       - name: libcuda-so
+         hostPath:
+           path: /usr/lib/x86_64-linux-gnu/libcuda.so
+       - name: libcuda-so-1
+         hostPath:
+           path: /usr/lib/x86_64-linux-gnu/libcuda.so.1
+       - name: libcuda-so-384-82
+         hostPath:
+           path: /usr/lib/x86_64-linux-gnu/libcuda.so.384.80
+       - name: shared-datasets
+         persistentVolumeClaim:
+             claimName: datasets
+       - name: user-home
+         persistentVolumeClaim:
+             claimName: home
+       containers:
+       - name: vae
+         image: chaneyk/tensorflow-cuda9:latest-gpu
+         workingDir: /NAS/home
+         command: ["python" , "code/CIS_hw4/main.py" ]
+         env:
+         - name: HOME
+           value: "/NAS/home"
+         resources:
+           limits:
+             cpu: 8
+             memory: 8Gi
+             alpha.kubernetes.io/nvidia-gpu: 1
+         volumeMounts:
+         - mountPath: /usr/local/nvidia/bin
+           name: bin
+         - mountPath: /usr/local/nvidia/lib
+           name: lib
+         - name: libcuda-so
+           mountPath: /usr/lib/x86_64-linux-gnu/libcuda.so
+         - name: libcuda-so-1
+           mountPath: /usr/lib/x86_64-linux-gnu/libcuda.so.1
+         - name: libcuda-so-384-82
+           mountPath: /usr/lib/x86_64-linux-gnu/libcuda.so.384.90
+         - name: user-home
+           mountPath: /NAS/home
+         - name: shared-datasets
+           mountPath: /NAS/data
